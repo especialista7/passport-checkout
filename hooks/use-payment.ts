@@ -40,22 +40,22 @@ export function usePayment() {
     amount: number,
     items: PaymentItem[] = [],
   ): Promise<PaymentResponse | null> => {
-    console.log("🚀 usePayment.createPayment called with REAL data:")
-    console.log("- Customer:", customerData)
-    console.log("- Amount:", amount, typeof amount)
-    console.log("- Items:", items)
+    console.log("🚀 usePayment.createPayment called with:", {
+      customerData,
+      amount,
+      items,
+    })
 
     setLoading(true)
     setError(null)
 
     try {
-      // ✅ Preparar dados REAIS do cliente (sem alterações)
       const requestBody = {
         customerData: {
           name: customerData.name.trim(),
           email: customerData.email.trim().toLowerCase(),
-          phone: customerData.phone.replace(/\D/g, ""), // Apenas números
-          cpf: customerData.cpf.replace(/\D/g, ""), // Apenas números
+          phone: customerData.phone,
+          cpf: customerData.cpf,
         },
         amount: Number(amount),
         items:
@@ -80,7 +80,7 @@ export function usePayment() {
               ],
       }
 
-      console.log("📤 Sending REAL request body:", JSON.stringify(requestBody, null, 2))
+      console.log("📤 Sending request to /api/payments/create with body:", requestBody)
 
       const response = await fetch("/api/payments/create", {
         method: "POST",
@@ -94,6 +94,7 @@ export function usePayment() {
         status: response.status,
         statusText: response.statusText,
         ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries()),
       })
 
       const data = await response.json()
@@ -107,7 +108,7 @@ export function usePayment() {
         throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`)
       }
 
-      console.log("✅ Payment created successfully with REAL data:", data)
+      console.log("✅ Payment created successfully:", data)
       return data
     } catch (err) {
       console.error("❌ Error in createPayment:", err)

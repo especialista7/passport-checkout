@@ -28,9 +28,6 @@ export default function CheckoutPage() {
   })
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
 
-  // ✅ VALOR REAL DO PRODUTO
-  const PRODUCT_PRICE = 360.9
-
   const validateForm = () => {
     const errors: Record<string, string> = {}
 
@@ -99,9 +96,8 @@ export default function CheckoutPage() {
   }
 
   const handlePayment = async () => {
-    console.log("🎯 handlePayment called with REAL form data")
+    console.log("🎯 handlePayment called")
     console.log("📋 Form data:", formData)
-    console.log("💰 Product price:", PRODUCT_PRICE)
 
     if (!validateForm()) {
       console.log("❌ Form validation failed:", formErrors)
@@ -110,45 +106,39 @@ export default function CheckoutPage() {
 
     console.log("✅ Form validation passed")
 
-    // ✅ Preparar dados REAIS do cliente (sem dados de teste)
+    // Preparar dados do cliente conforme API ViperpPay
     const customerData = {
       name: formData.fullName.trim(),
       email: formData.email.trim().toLowerCase(),
-      phone: formData.phone, // Manter formatação para validação
-      cpf: formData.cpf, // Manter formatação para validação
+      phone: formData.phone.replace(/\D/g, ""), // Apenas números
+      cpf: formData.cpf.replace(/\D/g, ""), // Apenas números
       document_type: getDocumentType(formData.cpf),
     }
 
-    console.log("👤 REAL Customer data prepared:", customerData)
+    console.log("👤 Customer data prepared:", customerData)
 
-    // ✅ Items com valor REAL
     const paymentItems = [
       {
         id: "passport-emission",
         title: "Emissão de Primeiro Passaporte",
         description: "Taxa para emissão de primeiro passaporte brasileiro",
-        price: PRODUCT_PRICE, // ✅ USAR VALOR REAL
+        price: 360.9,
         quantity: 1,
         is_physical: false,
       },
     ]
 
-    console.log("📦 REAL Payment items:", paymentItems)
+    console.log("📦 Payment items:", paymentItems)
 
     try {
-      console.log("🚀 Calling createPayment with REAL data...")
-      console.log("- Customer:", customerData.name, customerData.email)
-      console.log("- Amount:", PRODUCT_PRICE)
-      console.log("- CPF:", customerData.cpf)
+      console.log("🚀 Calling createPayment...")
 
-      // ✅ Passar dados REAIS para a API
-      const paymentData = await createPayment(customerData, PRODUCT_PRICE, paymentItems)
+      const paymentData = await createPayment(customerData, 360.9, paymentItems)
 
       console.log("📥 Payment response received:", paymentData)
 
       if (paymentData?.success && paymentData.transaction) {
-        console.log("✅ Payment successful with REAL data, redirecting...")
-        console.log("💰 Transaction amount:", paymentData.transaction.total_value)
+        console.log("✅ Payment successful, redirecting...")
 
         // Redirecionar para página de pagamento PIX com os dados da transação
         const params = new URLSearchParams({
@@ -194,12 +184,12 @@ export default function CheckoutPage() {
                   <h3 className="text-blue-700 font-medium">Emissão de Primeiro Passaporte</h3>
                   <p className="text-sm text-gray-600">Quantidade: 1</p>
                 </div>
-                <span className="text-blue-700 font-bold">R$ {PRODUCT_PRICE.toFixed(2).replace(".", ",")}</span>
+                <span className="text-blue-700 font-bold">R$ 360,90</span>
               </div>
             </div>
             <div className="flex justify-between items-center font-bold text-lg">
               <span>Total:</span>
-              <span>R$ {PRODUCT_PRICE.toFixed(2).replace(".", ",")}</span>
+              <span>R$ 360,90</span>
             </div>
           </CardContent>
         </Card>
@@ -288,7 +278,7 @@ export default function CheckoutPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-teal-800">R$ {PRODUCT_PRICE.toFixed(2).replace(".", ",")}</div>
+                  <div className="font-bold text-teal-800">R$ 360,90</div>
                   <div className="text-sm text-teal-600">Aprovação imediata</div>
                 </div>
               </div>
